@@ -7,21 +7,29 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 import java.util.Map;
 import java.util.HashMap;
+import android.content.Intent;
 import android.util.Log;
 
 
 public class JitsiModule extends ReactContextBaseJavaModule {
-    JitsiModule(ReactApplicationContext context) {
-        super(context);
-    }
+  public static Callback callback;
 
-    @Override
-    public String getName() {
-      return "JitsiModule";
-    }
+  JitsiModule(ReactApplicationContext context) {
+      super(context);
+  }
 
-    @ReactMethod
-    public void createJitsiEvent(String name, Callback callback) {
-      callback.invoke("Name here is: " + name);
-    }
+  @Override
+  public String getName() {
+    return "JitsiModule";
+  }
+
+  @ReactMethod
+  public void createJitsiMeeting(String domain, String roomName, Callback cb) {
+    JitsiModule.callback = cb;
+    cb.invoke("url: https://" + domain + "/" + roomName);
+    // MeetingActivity.domain = domain;
+    // MeetingActivity.roomName = roomName;
+    Intent intent = new Intent(MainActivity.self, MeetingActivity.class);
+    MainActivity.self.startActivity(intent);
+  }
 }
