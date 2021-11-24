@@ -9,11 +9,11 @@
  */
 
 import React from 'react';
-import { NativeModules, Button } from 'react-native';
+import { Button } from 'react-native';
+
+import { JitsiModule } from './src/modules';
 
 const App = () => {
-  const { JitsiModule } = NativeModules;
-
   const onPress = () => {
     console.log('We will invoke the native module here!');
     JitsiModule.createJitsiEvent('teste', console.log);
