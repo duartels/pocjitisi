@@ -9,7 +9,7 @@ export const JitsiMeetView = requireNativeComponent('RNJitsiMeetView');
 const { RNJitsiMeetModule } = NativeModules;
 
 interface IJitsiMeetModule {
-  call: (url: string, userInfo: {}) => void;
+  call: (url: string, userInfo: {}, callback: (msg: string) => void) => void;
   audioCall: (url: string, userInfo: {}) => void;
 }
 

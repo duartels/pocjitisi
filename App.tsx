@@ -29,6 +29,7 @@ const App = () => {
         avatar:
           'https://ui-avatars.com/api/?background=FF8888&size=128&color=FFFFFF&name=Bruno',
       },
+      console.log,
     );
   };
 

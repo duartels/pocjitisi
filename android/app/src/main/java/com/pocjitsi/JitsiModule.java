@@ -10,10 +10,7 @@ import java.util.HashMap;
 import android.content.Intent;
 import android.util.Log;
 
-
 public class JitsiModule extends ReactContextBaseJavaModule {
-  public static Callback callback;
-
   JitsiModule(ReactApplicationContext context) {
       super(context);
   }
@@ -24,9 +21,8 @@ public class JitsiModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void createJitsiMeeting(String domain, String roomName, Callback cb) {
-    JitsiModule.callback = cb;
-    cb.invoke("url: https://" + domain + "/" + roomName);
+  public void createJitsiMeeting(String domain, String roomName, Callback callback) {
+    callback.invoke("url: https://" + domain + "/" + roomName);
     // MeetingActivity.domain = domain;
     // MeetingActivity.roomName = roomName;
     Intent intent = new Intent(MainActivity.self, MeetingActivity.class);

@@ -4,6 +4,7 @@ import android.util.Log;
 import java.net.URL;
 import java.net.MalformedURLException;
 
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -32,7 +33,8 @@ public class RNJitsiMeetModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void call(String url, ReadableMap userInfo) {
+    public void call(String url, ReadableMap userInfo, Callback callback) {
+        callback.invoke("*** passou por aqui ***");
         UiThreadUtil.runOnUiThread(new Runnable() {
             @Override
             public void run() {

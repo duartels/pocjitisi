@@ -25,10 +25,9 @@ public class MeetingActivity extends JitsiMeetActivity  {
     //     JitsiMeetActivityDelegate.onBackPressed();
     // }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        JitsiModule.callback.invoke("MeetingActivity onCreate");
-        super.onCreate(savedInstanceState);
+    // @Override
+    // protected void onCreate(Bundle savedInstanceState) {
+    //     super.onCreate(savedInstanceState);
 
         // view = new JitsiMeetView(this);
         // JitsiMeetConferenceOptions options = new JitsiMeetConferenceOptions.Builder()
@@ -37,7 +36,7 @@ public class MeetingActivity extends JitsiMeetActivity  {
         // view.join(options);
 
         // setContentView(view);
-    }
+    // }
 
     // @Override
     // protected void onDestroy() {
