@@ -86,7 +86,7 @@ public class MeetingActivity extends JitsiMeetActivity {
     /**
      * Default URL as could be obtained from RestrictionManager
      */
-    private String defaultURL = "https://luan-gcp-jitsi.proseia.app";
+    private String defaultURL = "https://152-44-42-106.us-chi1.upcloud.host";
 
 
     // JitsiMeetActivity overrides
