@@ -24,8 +24,9 @@ public class JitsiModule extends ReactContextBaseJavaModule {
   @ReactMethod
   public void createJitsiMeeting(String domain, String roomName, Callback callback) {
     callback.invoke("url: https://" + domain + "/" + roomName);
-    MeetingActivity.domain = domain;
-    MeetingActivity.roomName = roomName;
+    Log.d("Teste", "Chegou aqui ------------------------------");
+    //MeetingActivity.domain = domain;
+    //MeetingActivity.roomName = roomName;
     Activity activity = getCurrentActivity();
     Intent intent = new Intent(activity, MeetingActivity.class);
     activity.startActivity(intent);
