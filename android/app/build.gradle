@@ -221,7 +221,7 @@ dependencies {
         implementation jscFlavor
     }
 
-    implementation ('org.jitsi.react:jitsi-meet-sdk:3.8.1') { transitive = true }
+    implementation ('org.jitsi.react:jitsi-meet-sdk:4.1.0') { transitive = true }
 }
 
 // Run this once to be able to run the application with BUCK

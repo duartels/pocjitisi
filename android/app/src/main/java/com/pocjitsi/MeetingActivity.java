@@ -73,6 +73,9 @@ public class MeetingActivity extends JitsiMeetActivity {
      */
     public static final String RESTRICTION_SERVER_URL = "SERVER_URL";
 
+    public static String domain;
+    public static String roomName;
+
     /**
      * Broadcast receiver for restrictions handling
      */
@@ -86,7 +89,7 @@ public class MeetingActivity extends JitsiMeetActivity {
     /**
      * Default URL as could be obtained from RestrictionManager
      */
-    private String defaultURL = "https://152-44-42-106.us-chi1.upcloud.host";
+    private String defaultURL = "https://209-50-53-173.us-chi1.upcloud.host";
 
 
     // JitsiMeetActivity overrides
@@ -147,7 +150,7 @@ public class MeetingActivity extends JitsiMeetActivity {
         resolveRestrictions();
         setJitsiMeetConferenceDefaultOptions();
         //super.initialize();
-        super.join("teste261121");
+        super.join(roomName != null ? roomName : "default-room");
     }
 
     @Override
@@ -164,8 +167,8 @@ public class MeetingActivity extends JitsiMeetActivity {
         // Set default options
         JitsiMeetConferenceOptions defaultOptions
             = new JitsiMeetConferenceOptions.Builder()
-            .setWelcomePageEnabled(true)
-            .setServerURL(buildURL(defaultURL))
+            // .setWelcomePageEnabled(true)
+            .setServerURL(buildURL(domain != null ? "https://" + domain : defaultURL))
             .setFeatureFlag("call-integration.enabled", false)
             .setFeatureFlag("resolution", 360)
             .setFeatureFlag("server-url-change.enabled", !configurationByRestrictions)
@@ -229,17 +232,17 @@ public class MeetingActivity extends JitsiMeetActivity {
         return super.onKeyUp(keyCode, event);
     }
 
-    @Override
-    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
-        super.onPictureInPictureModeChanged(isInPictureInPictureMode);
+    // @Override
+    // public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
+    //     super.onPictureInPictureModeChanged(isInPictureInPictureMode);
 
-        Log.d(TAG, "Is in picture-in-picture mode: " + isInPictureInPictureMode);
+    //     Log.d(TAG, "Is in picture-in-picture mode: " + isInPictureInPictureMode);
 
-        if (!isInPictureInPictureMode) {
-            this.startActivity(new Intent(this, getClass())
-                .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-        }
-    }
+    //     if (!isInPictureInPictureMode) {
+    //         this.startActivity(new Intent(this, getClass())
+    //             .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+    //     }
+    // }
 
     // Helper methods
     //
