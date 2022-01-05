@@ -66,7 +66,7 @@ import java.util.Map;
  * of it. Further attempts at launching the application once it was already
  * launched will result in {@link MainActivity#onNewIntent(Intent)} being called.
  */
-public class MeetingActivity extends JitsiMeetActivity {
+public class JitsiActivity extends JitsiMeetActivity {
     /**
      * The request code identifying requests for the permission to draw on top
      * of other apps. The value must be 16-bit and is arbitrarily chosen here.
@@ -150,8 +150,10 @@ public class MeetingActivity extends JitsiMeetActivity {
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BroadcastEvent.Type.CONFERENCE_JOINED.getAction());
+        intentFilter.addAction(BroadcastEvent.Type.CONFERENCE_TERMINATED.getAction());
         intentFilter.addAction(BroadcastEvent.Type.AUDIO_MUTED_CHANGED.getAction());
         intentFilter.addAction(BroadcastEvent.Type.VIDEO_MUTED_CHANGED.getAction());
+        intentFilter.addAction(BroadcastEvent.Type.SCREEN_SHARE_TOGGLED.getAction());
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
 
         setJitsiMeetConferenceDefaultOptions();
@@ -183,7 +185,7 @@ public class MeetingActivity extends JitsiMeetActivity {
             .setFeatureFlag("chat.enabled", true)
             .setFeatureFlag("close-captions.enabled", false)
             .setFeatureFlag("invite.enabled", false)
-            .setFeatureFlag("android.screensharing.enabled", false)
+            .setFeatureFlag("android.screensharing.enabled", true)
             .setFeatureFlag("live-streaming.enabled", false)
             .setFeatureFlag("meeting-name.enabled", false)
             .setFeatureFlag("meeting-password.enabled", false)
@@ -198,6 +200,8 @@ public class MeetingActivity extends JitsiMeetActivity {
             .setFeatureFlag("toolbox.alwaysVisible", false)
             .setFeatureFlag("toolbox.enabled", true)
             .setFeatureFlag("welcomepage.enabled", false)
+            .setAudioMuted(false)
+            .setVideoMuted(true)
             .build();
         JitsiMeet.setDefaultConferenceOptions(defaultOptions);
     }
@@ -287,6 +291,7 @@ public class MeetingActivity extends JitsiMeetActivity {
                     break;
                 case CONFERENCE_TERMINATED:
                     onConferenceTerminated(event.getData());
+                    JitsiModule.sendEvent("conferenceTerminated", convertHashMapToWritableMap(event.getData()));
                     break;
                 case PARTICIPANT_JOINED:
                     onParticipantJoined(event.getData());
@@ -302,6 +307,9 @@ public class MeetingActivity extends JitsiMeetActivity {
                     break;
                 case VIDEO_MUTED_CHANGED:
                     JitsiModule.sendEvent("videoMutedChanged", convertHashMapToWritableMap(event.getData()));
+                    break;
+                case SCREEN_SHARE_TOGGLED:
+                    JitsiModule.sendEvent("screenShareToggled", convertHashMapToWritableMap(event.getData()));
                     break;
             }
         }

@@ -17,16 +17,24 @@ const App = () => {
   const onPress = () => {
     console.log('We will invoke the native module here!');
 
-    JitsiModule.addEventListener('audioMutedChanged', (event: any) => {
-      console.log('audioMutedChanged', event);
+    JitsiModule.onConferenceJoined(() => {
+      console.log('conferenceJoined');
     });
 
-    JitsiModule.addEventListener('videoMutedChanged', (event: any) => {
-      console.log('videoMutedChanged', event);
+    JitsiModule.onConferenceTerminated(() => {
+      console.log('conferenceTerminated');
     });
 
-    JitsiModule.addEventListener('conferenceJoined', (event: any) => {
-      console.log('conferenceJoined', event);
+    JitsiModule.onAudioMutedChange(muted => {
+      console.log('audioMutedChange', muted);
+    });
+
+    JitsiModule.onVideoMutedChange(muted => {
+      console.log('videoMutedChange', muted);
+    });
+
+    JitsiModule.onScreenShareToggled(sharing => {
+      console.log('screenShareToggled', sharing);
     });
 
     JitsiModule.createJitsiMeeting(
