@@ -41,8 +41,13 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
 
-import androidx.annotation.Nullable;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.Arguments;
 
+import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import org.jitsi.meet.sdk.BroadcastEvent;
 import org.jitsi.meet.sdk.JitsiMeet;
 import org.jitsi.meet.sdk.JitsiMeetActivity;
 import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
@@ -52,6 +57,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The one and only Activity that the Jitsi Meet app needs. The
@@ -138,16 +144,16 @@ public class MeetingActivity extends JitsiMeetActivity {
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                // As new restrictions including server URL are received,
-                // conference should be restarted with new configuration.
-                leave();
-                recreate();
+                onBroadcastReceived(intent);
             }
         };
-        registerReceiver(broadcastReceiver,
-            new IntentFilter(Intent.ACTION_APPLICATION_RESTRICTIONS_CHANGED));
 
-        resolveRestrictions();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BroadcastEvent.Type.CONFERENCE_JOINED.getAction());
+        intentFilter.addAction(BroadcastEvent.Type.AUDIO_MUTED_CHANGED.getAction());
+        intentFilter.addAction(BroadcastEvent.Type.VIDEO_MUTED_CHANGED.getAction());
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
+
         setJitsiMeetConferenceDefaultOptions();
         //super.initialize();
         super.join(roomName != null ? roomName : "default-room");
@@ -156,7 +162,7 @@ public class MeetingActivity extends JitsiMeetActivity {
     @Override
     public void onDestroy() {
         if (broadcastReceiver != null) {
-            unregisterReceiver(broadcastReceiver);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
             broadcastReceiver = null;
         }
 
@@ -195,37 +201,6 @@ public class MeetingActivity extends JitsiMeetActivity {
             .build();
         JitsiMeet.setDefaultConferenceOptions(defaultOptions);
     }
-
-    private void resolveRestrictions() {
-        // RestrictionsManager manager =
-        //     (RestrictionsManager) getSystemService(Context.RESTRICTIONS_SERVICE);
-        // Bundle restrictions = manager.getApplicationRestrictions();
-        // Collection<RestrictionEntry> entries = manager.getManifestRestrictions(
-        //     getApplicationContext().getPackageName());
-        // for (RestrictionEntry restrictionEntry : entries) {
-        //     String key = restrictionEntry.getKey();
-        //     if (RESTRICTION_SERVER_URL.equals(key)) {
-        //         // If restrictions are passed to the application.
-        //         if (restrictions != null &&
-        //             restrictions.containsKey(RESTRICTION_SERVER_URL)) {
-        //             defaultURL = restrictions.getString(RESTRICTION_SERVER_URL);
-        //             configurationByRestrictions = true;
-        //         // Otherwise use default URL from app-restrictions.xml.
-        //         } else {
-        //             defaultURL = restrictionEntry.getSelectedString();
-        //             configurationByRestrictions = false;
-        //         }
-        //     }
-        // }
-    }
-
-    @Override
-    protected void onConferenceTerminated(HashMap<String, Object> extraData) {
-        Log.d(TAG, "Conference terminated: " + extraData);
-    }
-
-    // Activity lifecycle method overrides
-    //
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -272,6 +247,63 @@ public class MeetingActivity extends JitsiMeetActivity {
             return new URL(urlStr);
         } catch (MalformedURLException e) {
             return null;
+        }
+    }
+
+    public WritableMap convertHashMapToWritableMap(HashMap<String, Object> hashMap) {
+        WritableMap map = Arguments.createMap();
+
+        for (Map.Entry<String, Object> pair : hashMap.entrySet()) {
+            String key = pair.getKey();
+            Object value = pair.getValue();
+
+            if (value instanceof Boolean) {
+                map.putBoolean(key, (Boolean) value);
+            } else if (value instanceof Integer) {
+                map.putInt(key, (Integer) value);
+            } else if (value instanceof Double) {
+                map.putDouble(key, (Double) value);
+            } else if (value instanceof String) {
+                map.putString(key, (String) value);
+            } else {
+                map.putString(key, value.toString());
+            }
+        }
+
+        return map;
+    }
+
+    private void onBroadcastReceived(Intent intent) {
+        if (intent != null) {
+            BroadcastEvent event = new BroadcastEvent(intent);
+
+            switch (event.getType()) {
+                case CONFERENCE_JOINED:
+                    onConferenceJoined(event.getData());
+                    JitsiModule.sendEvent("conferenceJoined", convertHashMapToWritableMap(event.getData()));
+                    break;
+                case CONFERENCE_WILL_JOIN:
+                    onConferenceWillJoin(event.getData());
+                    break;
+                case CONFERENCE_TERMINATED:
+                    onConferenceTerminated(event.getData());
+                    break;
+                case PARTICIPANT_JOINED:
+                    onParticipantJoined(event.getData());
+                    break;
+                case PARTICIPANT_LEFT:
+                    onParticipantLeft(event.getData());
+                    break;
+                case READY_TO_CLOSE:
+                    onReadyToClose();
+                    break;
+                case AUDIO_MUTED_CHANGED:
+                    JitsiModule.sendEvent("audioMutedChanged", convertHashMapToWritableMap(event.getData()));
+                    break;
+                case VIDEO_MUTED_CHANGED:
+                    JitsiModule.sendEvent("videoMutedChanged", convertHashMapToWritableMap(event.getData()));
+                    break;
+            }
         }
     }
 }

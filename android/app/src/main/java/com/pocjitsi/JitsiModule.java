@@ -5,6 +5,8 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import java.util.Map;
 import java.util.HashMap;
 import android.app.Activity;
@@ -12,8 +14,11 @@ import android.content.Intent;
 import android.util.Log;
 
 public class JitsiModule extends ReactContextBaseJavaModule {
+  private static ReactApplicationContext reactContext;
+
   JitsiModule(ReactApplicationContext context) {
       super(context);
+      reactContext = context;
   }
 
   @Override
@@ -31,4 +36,23 @@ public class JitsiModule extends ReactContextBaseJavaModule {
     Intent intent = new Intent(activity, MeetingActivity.class);
     activity.startActivity(intent);
   }
+
+  public static void sendEvent(String eventName, WritableMap params) {
+    reactContext
+     .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+     .emit(eventName, params);
+  }
+
+  // @ReactMethod
+  // public void addListener(String eventName) {
+  //   Log.d("addListener", "addListener ------------------------------");
+  //   // Set up any upstream listeners or background tasks as necessary
+  // }
+
+  // @ReactMethod
+  // public void removeListeners(Integer count) {
+  //   Log.d("removeListeners", "removeListeners ------------------------------");
+  //   // Remove upstream listeners, stop unnecessary background tasks
+  // }
+
 }

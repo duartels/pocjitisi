@@ -16,6 +16,19 @@ import { JitsiModule /*, JitsiMeetModule */ } from './src/modules';
 const App = () => {
   const onPress = () => {
     console.log('We will invoke the native module here!');
+
+    JitsiModule.addEventListener('audioMutedChanged', (event: any) => {
+      console.log('audioMutedChanged', event);
+    });
+
+    JitsiModule.addEventListener('videoMutedChanged', (event: any) => {
+      console.log('videoMutedChanged', event);
+    });
+
+    JitsiModule.addEventListener('conferenceJoined', (event: any) => {
+      console.log('conferenceJoined', event);
+    });
+
     JitsiModule.createJitsiMeeting(
       'luan-gcp-jitsi.proseia.app',
       'pocjitsi241121test',
